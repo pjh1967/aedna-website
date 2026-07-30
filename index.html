@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEDNA — AI 기반 전자설계 자동화 네트워크</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --board:#10241C;
+    --board-2:#173327;
+    --paper:#F0EFE3;
+    --paper-2:#E7E5D6;
+    --ink:#14201B;
+    --ink-soft:#4B564E;
+    --copper:#B5651D;
+    --copper-deep:#7E4514;
+    --copper-light:#E3A467;
+    --circuit:#1F6D4C;
+    --signal:#2C6E8C;
+    --line:rgba(20,32,27,0.14);
+    --line-board:rgba(240,239,227,0.16);
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Pretendard Variable","Pretendard",-apple-system,"Malgun Gothic",sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  a{color:inherit;}
+  img,svg{display:block;max-width:100%;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+
+  /* ===== header ===== */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(240,239,227,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand-mark{width:26px;height:26px;flex:none;}
+  .brand-text{font-size:15px;font-weight:600;letter-spacing:0.04em;}
+  .brand-sub{display:block;font-size:10px;color:var(--ink-soft);letter-spacing:0.06em;font-weight:400;}
+  .navlinks{display:flex;gap:2px;list-style:none;margin:0;padding:0;}
+  .navlinks a{
+    display:block;padding:8px 14px;font-size:13px;text-decoration:none;color:var(--ink-soft);
+    border-radius:var(--radius);
+  }
+  .navlinks a:hover{color:var(--ink);background:var(--paper-2);}
+  .navcta{
+    font-size:12.5px;padding:9px 16px;border:1px solid var(--ink);border-radius:var(--radius);
+    text-decoration:none;color:var(--ink);white-space:nowrap;
+  }
+  .navcta:hover{background:var(--ink);color:var(--paper);}
+  .navtoggle{display:none;}
+  @media(max-width:860px){
+    .navlinks{display:none;}
+  }
+
+  /* ===== hero ===== */
+  .hero{
+    position:relative;background:var(--board);color:var(--paper);overflow:hidden;
+  }
+  .hero-inner{
+    position:relative;z-index:2;padding:96px 32px 84px;max-width:1120px;margin:0 auto;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;font-size:11.5px;letter-spacing:0.14em;
+    color:var(--copper-light);margin-bottom:28px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--copper-light);}
+  .hero h1{
+    font-size:clamp(32px,5vw,56px);line-height:1.22;font-weight:600;margin:0 0 22px;
+    max-width:820px;letter-spacing:-0.01em;
+  }
+  .hero h1 em{font-style:normal;color:var(--copper-light);}
+  .hero p{
+    font-size:16.5px;color:rgba(240,239,227,0.72);max-width:560px;margin:0 0 40px;
+  }
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{
+    font-size:13.5px;padding:13px 22px;border-radius:var(--radius);text-decoration:none;
+    display:inline-flex;align-items:center;gap:8px;font-weight:500;
+  }
+  .btn-primary{background:var(--copper);color:#1C0D02;}
+  .btn-primary:hover{background:var(--copper-light);}
+  .btn-ghost{border:1px solid rgba(240,239,227,0.32);color:var(--paper);}
+  .btn-ghost:hover{border-color:var(--paper);}
+  .hero-board{position:absolute;inset:0;z-index:1;opacity:0.9;}
+  .hero-fade{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg, rgba(16,36,28,0) 40%, var(--board) 100%);}
+
+  /* ===== trace rail (signature element) ===== */
+  .rail-wrap{position:relative;}
+  .rail{
+    position:absolute;left:0;top:0;bottom:0;width:24px;
+    display:none;
+  }
+  @media(min-width:960px){
+    .rail{display:block;left:calc((100% - 1120px)/2 + 32px - 24px);}
+  }
+
+  section{position:relative;padding:88px 0;}
+  .section-head{max-width:640px;margin-bottom:52px;}
+  .ref{
+    display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--copper-deep);
+    letter-spacing:0.1em;margin-bottom:14px;
+  }
+  .ref .via{width:7px;height:7px;border-radius:50%;background:var(--copper);flex:none;}
+  .section-head h2{font-size:clamp(24px,3vw,32px);font-weight:600;margin:0 0 14px;letter-spacing:-0.01em;}
+  .section-head p{font-size:15px;color:var(--ink-soft);margin:0;max-width:560px;}
+
+  /* ===== purpose (legend list) ===== */
+  .legend{border-top:1px solid var(--line);}
+  .legend-row{
+    display:grid;grid-template-columns:64px 1fr;gap:20px;
+    padding:26px 0;border-bottom:1px solid var(--line);align-items:start;
+  }
+  .legend-num{font-size:13px;color:var(--copper);padding-top:2px;}
+  .legend-row h3{font-size:16px;font-weight:600;margin:0 0 6px;}
+  .legend-row p{margin:0;font-size:14px;color:var(--ink-soft);max-width:600px;}
+
+  /* ===== activities grid ===== */
+  .activity-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  .activity-card{background:var(--paper);padding:26px 22px;min-height:150px;
+    display:flex;flex-direction:column;justify-content:space-between;}
+  .activity-card .tag{font-size:10.5px;color:var(--ink-soft);letter-spacing:0.08em;margin-bottom:16px;}
+  .activity-card p{font-size:14px;margin:0;line-height:1.5;}
+  @media(max-width:860px){.activity-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.activity-grid{grid-template-columns:1fr;}}
+
+  /* ===== membership ===== */
+  .member-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+    border:1px solid var(--line);}
+  .member-card{background:var(--paper);padding:36px 32px;}
+  .member-card .kind{font-size:11px;color:var(--copper-deep);letter-spacing:0.08em;margin-bottom:10px;}
+  .member-card h3{font-size:20px;font-weight:600;margin:0 0 12px;}
+  .member-card p{font-size:14px;color:var(--ink-soft);margin:0 0 20px;}
+  .member-card ul{margin:0;padding:0;list-style:none;font-size:13.5px;}
+  .member-card li{padding:9px 0;border-top:1px solid var(--line);display:flex;gap:10px;}
+  .member-card li:before{content:"—";color:var(--copper);flex:none;}
+  @media(max-width:760px){.member-grid{grid-template-columns:1fr;}}
+
+  .join-steps{margin-top:44px;display:flex;gap:0;flex-wrap:wrap;}
+  .join-step{flex:1;min-width:180px;padding:18px 20px;border-left:2px solid var(--copper);}
+  .join-step .n{font-size:11px;color:var(--copper-deep);margin-bottom:6px;}
+  .join-step p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+
+  /* ===== governance ===== */
+  .gov{background:var(--board);color:var(--paper);}
+  .gov .section-head p{color:rgba(240,239,227,0.62);}
+  .gov .ref{color:var(--copper-light);}
+  .org{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(240,239,227,0.14);
+    border:1px solid rgba(240,239,227,0.14);margin-bottom:40px;}
+  .org-card{background:var(--board-2);padding:26px 22px;}
+  .org-card .role{font-size:10.5px;color:var(--copper-light);letter-spacing:0.08em;margin-bottom:10px;}
+  .org-card h4{font-size:16px;font-weight:600;margin:0 0 8px;}
+  .org-card p{font-size:13px;color:rgba(240,239,227,0.6);margin:0;}
+  @media(max-width:760px){.org{grid-template-columns:1fr;}}
+
+  .badges{display:flex;gap:10px;flex-wrap:wrap;}
+  .badge{
+    font-size:12px;padding:8px 14px;border:1px solid rgba(240,239,227,0.28);border-radius:100px;
+    color:rgba(240,239,227,0.85);
+  }
+
+  /* ===== cta ===== */
+  .cta{background:var(--paper-2);}
+  .cta-box{
+    display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
+    padding:52px 0;
+  }
+  .cta-box h2{font-size:26px;font-weight:600;margin:0 0 8px;}
+  .cta-box p{margin:0;font-size:14.5px;color:var(--ink-soft);}
+  .btn-dark{background:var(--ink);color:var(--paper);}
+  .btn-dark:hover{background:var(--circuit);}
+
+  /* ===== footer ===== */
+  footer{background:var(--board);color:rgba(240,239,227,0.55);padding:48px 0 32px;font-size:13px;}
+  .foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:32px;}
+  .foot-brand{font-size:14px;color:var(--paper);margin-bottom:8px;font-weight:600;}
+  .foot-meta{border-top:1px solid rgba(240,239,227,0.14);padding-top:20px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11.5px;}
+
+  @media(prefers-reduced-motion:no-preference){
+    .trace-draw{stroke-dasharray:900;stroke-dashoffset:900;animation:draw 1.8s ease-out forwards;}
+  }
+  @keyframes draw{to{stroke-dashoffset:0;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <svg class="brand-mark" viewBox="0 0 26 26" fill="none">
+        <rect x="6" y="6" width="14" height="14" rx="1" stroke="var(--copper)" stroke-width="1.6"/>
+        <path d="M6 10H2M6 16H2M20 10H24M20 16H24M10 6V2M16 6V2M10 20V24M16 20V24" stroke="var(--ink)" stroke-width="1.4"/>
+      </svg>
+      <span>
+        <span class="brand-text">AEDNA</span>
+        <span class="brand-sub mono">AI ELECTRONIC DESIGN AUTOMATION NETWORK</span>
+      </span>
+    </a>
+    <ul class="navlinks">
+      <li><a href="#purpose">목적</a></li>
+      <li><a href="#activities">활동</a></li>
+      <li><a href="#members">회원</a></li>
+      <li><a href="#governance">운영체계</a></li>
+    </ul>
+    <a class="navcta" href="#join">참여 문의</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <svg class="hero-board" viewBox="0 0 1120 520" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="1" fill="rgba(240,239,227,0.10)"/>
+      </pattern>
+    </defs>
+    <rect width="1120" height="520" fill="url(#grid)"/>
+    <g fill="none" stroke="rgba(181,101,29,0.55)" stroke-width="1.6" stroke-linecap="round">
+      <path class="trace-draw" d="M40 60 H260 V150 H520" />
+      <path class="trace-draw" d="M1080 90 H860 V40" />
+      <path class="trace-draw" d="M1080 260 H900 V330 H700" />
+      <path class="trace-draw" d="M60 420 H220 V470 H400" />
+      <path class="trace-draw" d="M900 470 H1000 V400" />
+    </g>
+    <g fill="rgba(181,101,29,0.75)">
+      <circle cx="40" cy="60" r="3.4"/><circle cx="260" cy="60" r="3.4"/><circle cx="260" cy="150" r="3.4"/><circle cx="520" cy="150" r="3.4"/>
+      <circle cx="1080" cy="90" r="3.4"/><circle cx="860" cy="90" r="3.4"/><circle cx="860" cy="40" r="3.4"/>
+      <circle cx="1080" cy="260" r="3.4"/><circle cx="900" cy="260" r="3.4"/><circle cx="900" cy="330" r="3.4"/><circle cx="700" cy="330" r="3.4"/>
+      <circle cx="60" cy="420" r="3.4"/><circle cx="220" cy="420" r="3.4"/><circle cx="220" cy="470" r="3.4"/><circle cx="400" cy="470" r="3.4"/>
+      <circle cx="900" cy="470" r="3.4"/><circle cx="1000" cy="470" r="3.4"/><circle cx="1000" cy="400" r="3.4"/>
+    </g>
+  </svg>
+  <div class="hero-fade" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="eyebrow mono"><span class="dot"></span>AI 기반 전자설계 자동화 네트워크 · 비영리 협의체</div>
+    <h1>AI와 EDA가 만나는 지점에서,<br>PCB 설계의 다음 <em>길</em>을 함께 놓습니다</h1>
+    <p>산업·학계·연구기관이 함께하는 협력 네트워크로, AI 기반 PCB 설계와 EDA 기술 동향을 공유하고 설계 직무 변화에 대응하는 방향을 모색합니다.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#join">회원 가입 문의</a>
+      <a class="btn btn-ghost" href="#purpose">협의회 목적 보기</a>
+    </div>
+  </div>
+</section>
+
+<section id="purpose">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="ref mono"><span class="via"></span>제4조 · 목적</div>
+      <h2>AI와 EDA의 융합을 중심에 둔 다섯 가지 목표</h2>
+      <p>AEDNA는 AI 기술과 전자설계자동화(EDA)의 융합을 중심으로 PCB 설계 분야의 공동 발전과 협력 체계 구축을 목적으로 합니다.</p>
+    </div>
+    <div class="legend">
+      <div class="legend-row">
+        <div class="legend-num mono">01</div>
+        <div><h3>기술 동향 공유</h3><p>AI 기반 PCB 설계 및 EDA 기술 동향을 공유하고 함께 논의합니다.</p></div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-num mono">02</div>
+        <div><h3>현안 대응</h3><p>PCB 설계·EDA·AI 관련 현안에 대한 의견을 수렴하고 공동으로 대응합니다.</p></div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-num mono">03</div>
+        <div><h3>협력 네트워크</h3><p>산업·학계·연구기관 간 협력 네트워크를 구축합니다.</p></div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-num mono">04</div>
+        <div><h3>직무 변화 대응</h3><p>AI 도입에 따른 설계 직무 변화에 대해 협의하고 대응 방향을 도출합니다.</p></div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-num mono">05</div>
+        <div><h3>교육·정책 제안</h3><p>교육·정책·표준 관련 사안을 공동으로 제안하고 권고합니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="activities" style="background:var(--paper-2);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="ref mono"><span class="via"></span>제5조 · 주요 활동</div>
+      <h2>협의회가 실제로 하는 일</h2>
+      <p>정기 협의회부터 정책 제안까지, 목적을 달성하기 위해 수행하는 여덟 가지 활동입니다.</p>
+    </div>
+    <div class="activity-grid">
+      <div class="activity-card"><div class="tag mono">ACT · 01</div><p>정기·수시 협의회 및 간담회 개최</p></div>
+      <div class="activity-card"><div class="tag mono">ACT · 02</div><p>AI PCB 설계·EDA 관련 정보 교류와 사례 공유</p></div>
+      <div class="activity-card"><div class="tag mono">ACT · 03</div><p>AI 기반 PCB 설계·EDA 교육 과정, 특강, 워크숍 공동 기획</p></div>
+      <div class="activity-card"><div class="tag mono">ACT · 04</div><p>AI·PCB 설계 경진대회, 공모전, 해커톤 공동 개최</p></div>
+      <div class="activity-card"><div class="tag mono">ACT · 05</div><p>AI·EDA·PCB 설계 분야 인력 양성 및 재교육 프로그램 제안</p></div>
+      <div class="activity-card"><div class="tag mono">ACT · 06</div><p>정부·공공기관·지자체 대상 정책 제안 및 기술 자문</p></div>
+      <div class="activity-card"><div class="tag mono">ACT · 07</div><p>공동 성명, 권고안, 의견서 작성 및 대외 전달</p></div>
+      <div class="activity-card"><div class="tag mono">ACT · 08</div><p>관련 협·단체 및 공공기관과의 협력 창구 역할</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="members">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="ref mono"><span class="via"></span>제6·7조 · 회원</div>
+      <h2>두 가지 형태로 참여할 수 있습니다</h2>
+      <p>개인과 기관 모두 협의회의 활동에 참여하고 의견을 개진할 권리를 가집니다.</p>
+    </div>
+    <div class="member-grid">
+      <div class="member-card">
+        <div class="kind mono">MEMBER · 개인</div>
+        <h3>개인회원</h3>
+        <p>PCB 설계, 회로 설계, EDA, AI, 전자산업 분야에 종사하는 개인.</p>
+        <ul>
+          <li>협의회 및 간담회 참여</li>
+          <li>교육 과정·워크숍 우선 안내</li>
+          <li>기술 대회 참가 자격</li>
+        </ul>
+      </div>
+      <div class="member-card">
+        <div class="kind mono">MEMBER · 기관</div>
+        <h3>기관회원</h3>
+        <p>기업, 연구소, 대학, 공공기관 등 단체.</p>
+        <ul>
+          <li>산업·학계·연구기관 협력 네트워크 참여</li>
+          <li>정책 제안 및 공동 성명 참여</li>
+          <li>분과·지역 협의체 구성 제안 가능</li>
+        </ul>
+      </div>
+    </div>
+    <div class="join-steps">
+      <div class="join-step"><div class="n mono">STEP 01</div><p>가입 신청서 제출</p></div>
+      <div class="join-step"><div class="n mono">STEP 02</div><p>운영위원회 승인</p></div>
+      <div class="join-step"><div class="n mono">STEP 03</div><p>회원 활동 시작 · 자유 탈퇴 가능</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="gov" id="governance">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="ref mono"><span class="via"></span>제9~11조 · 운영체계</div>
+      <h2>대표·부대표·운영위원이 함께 결정합니다</h2>
+      <p>운영위원회는 협의회 운영 방향, 회원 승인, 분과 구성, 대외 협력을 협의·결정합니다.</p>
+    </div>
+    <div class="org">
+      <div class="org-card">
+        <div class="role mono">CHAIR</div>
+        <h4>대표</h4>
+        <p>협의회를 대표하고 회의를 주재합니다. 임기 2년, 연임 가능.</p>
+      </div>
+      <div class="org-card">
+        <div class="role mono">VICE-CHAIR</div>
+        <h4>부대표</h4>
+        <p>대표를 보좌하며 운영위원회 활동에 참여합니다.</p>
+      </div>
+      <div class="org-card">
+        <div class="role mono">COMMITTEE</div>
+        <h4>운영위원</h4>
+        <p>운영 방향, 회원 관리, 분과 구성, 대외 협력을 함께 협의합니다.</p>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge">회비 없는 비영리 운영</span>
+      <span class="badge">정기회의 연 1회 이상</span>
+      <span class="badge">참석 회원 합의 원칙</span>
+      <span class="badge">재정 투명 공개</span>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="join">
+  <div class="wrap cta-box">
+    <div>
+      <h2>협의회와 함께하시겠습니까</h2>
+      <p>개인회원·기관회원 가입 문의 및 협력 제안을 받고 있습니다.</p>
+    </div>
+    <a class="btn btn-dark" href="#top">가입 문의하기</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">AEDNA</div>
+        <div>AI Electronic Design Automation Network Association</div>
+        <div>AI 기반 전자설계 자동화 네트워크</div>
+      </div>
+      <div>
+        <div style="color:var(--paper);margin-bottom:8px;">바로가기</div>
+        <div><a href="#purpose">목적</a></div>
+        <div><a href="#activities">활동</a></div>
+        <div><a href="#members">회원 가입</a></div>
+      </div>
+      <div>
+        <div style="color:var(--paper);margin-bottom:8px;">단체 정보</div>
+        <div>대표자 민경일</div>
+        <div>고유번호 681-80-03583</div>
+        <div style="max-width:260px;">경기도 화성시 동탄구 동탄순환대로 830, 20층 15호<br>(영천동, 동탄 SK V1 center)</div>
+      </div>
+    </div>
+    <div class="foot-meta mono">
+      <span>설립일 2026.01.29 · 등록일 2026.02.04</span>
+      <span>© 2026 AEDNA. NON-PROFIT ASSOCIATION.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
