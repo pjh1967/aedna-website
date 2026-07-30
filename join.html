@@ -158,7 +158,7 @@
   <div class="wrap">
     <div class="ref mono"><span class="via"></span>제7조 · 가입 및 탈퇴</div>
     <h1>AEDNA 가입 신청</h1>
-    <p>가입 신청과 운영위원회의 승인으로 회원 자격이 성립합니다. 아래 양식을 제출해 주시면 검토 후 이메일로 안내드립니다.</p>
+    <p>가입 신청과 운영위원회의 승인으로 회원 자격이 성립합니다. 아래 양식을 제출해 주시면 검토 후 결과를 안내드립니다.</p>
   </div>
 </div>
 
@@ -235,7 +235,7 @@
       <h3>가입 절차</h3>
       <div class="mini-step"><span class="num">01</span><p>신청서 제출</p></div>
       <div class="mini-step"><span class="num">02</span><p>운영위원회 검토 및 승인</p></div>
-      <div class="mini-step"><span class="num">03</span><p>승인 안내 이메일 발송 후 회원 활동 시작</p></div>
+      <div class="mini-step"><span class="num">03</span><p>승인 안내 후 회원 활동 시작</p></div>
       <div class="divider"></div>
       <div class="contact">
         문의사항은 아래로 연락 주세요.
@@ -274,7 +274,7 @@
         body: new FormData(form)
       });
       statusMsg.classList.add('ok');
-      statusMsg.textContent = '신청이 접수되었습니다. 검토 후 이메일로 안내드리겠습니다.';
+      statusMsg.textContent = '신청이 접수되었습니다. 운영위원회 검토 후 결과를 안내드립니다.';
       form.reset();
     } catch (err) {
       statusMsg.classList.add('err');
