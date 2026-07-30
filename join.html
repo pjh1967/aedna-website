@@ -43,44 +43,90 @@
   .page-banner h1{font-size:clamp(26px,4vw,38px);font-weight:600;margin:0 0 12px;letter-spacing:-0.01em;}
   .page-banner p{font-size:15px;color:rgba(240,239,227,0.68);margin:0;max-width:520px;}
 
-  main{padding:64px 0 96px;}
-  .form-grid{display:grid;grid-template-columns:1fr 320px;gap:56px;align-items:start;}
+  main{padding:56px 0 96px;}
+  .form-grid{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start;}
   @media(max-width:860px){.form-grid{grid-template-columns:1fr;}}
 
-  fieldset{border:none;margin:0 0 28px;padding:0;}
-  legend{font-size:11px;color:var(--copper-deep);letter-spacing:0.08em;margin-bottom:12px;padding:0;}
-  .field{margin-bottom:20px;}
-  .field label{display:block;font-size:13.5px;font-weight:500;margin-bottom:8px;}
-  .field .hint{font-size:12px;color:var(--ink-soft);font-weight:400;margin-left:6px;}
-  input[type=text],input[type=email],input[type=tel],select,textarea{
-    width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius);
-    background:var(--paper-2);color:var(--ink);font-size:14px;font-family:inherit;
+  .form-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:44px 44px 40px;
   }
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--copper);background:var(--paper);}
-  textarea{resize:vertical;min-height:100px;}
-  .radio-row{display:flex;gap:20px;flex-wrap:wrap;}
-  .radio-opt{display:flex;align-items:center;gap:8px;font-size:14px;}
-  .check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .check-opt{display:flex;align-items:center;gap:8px;font-size:13.5px;}
-  .consent{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--ink-soft);
-    padding:16px 0;border-top:1px solid var(--line);margin-top:6px;}
-  .consent input{margin-top:3px;}
+  @media(max-width:600px){.form-card{padding:28px 22px 26px;}}
+
+  fieldset{border:none;margin:0 0 30px;padding:0 0 30px;border-bottom:1px solid var(--line);}
+  fieldset:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  legend{width:100%;padding:0;margin-bottom:18px;}
+  .step-legend{display:flex;align-items:center;gap:10px;}
+  .step-num{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--copper);
+    width:22px;height:22px;border:1px solid var(--copper);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .step-title{font-size:13.5px;font-weight:600;letter-spacing:0.01em;}
+  .step-title .hint{font-size:12px;color:var(--ink-soft);font-weight:400;margin-left:6px;}
+
+  .field{margin-bottom:18px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:13px;color:var(--ink-soft);font-weight:500;margin-bottom:7px;}
+  .field label .req{color:var(--copper);margin-left:2px;}
+  input[type=text],input[type=email],input[type=tel],select,textarea{
+    width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:5px;
+    background:var(--paper);color:var(--ink);font-size:14px;font-family:inherit;
+    transition:border-color .12s ease, box-shadow .12s ease;
+  }
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--copper);box-shadow:0 0 0 3px rgba(181,101,29,0.14);
+  }
+  textarea{resize:vertical;min-height:96px;}
+
+  .segment{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .segment label{
+    padding:10px 22px;font-size:13.5px;cursor:pointer;background:var(--paper);
+    color:var(--ink-soft);transition:background .12s ease, color .12s ease;
+  }
+  .segment label + label{border-left:1px solid var(--line);}
+  .segment input{position:absolute;opacity:0;pointer-events:none;}
+  .segment label:has(input:checked){background:var(--copper);color:#1C0D02;font-weight:500;}
+
+  .chip-grid{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:100px;
+    padding:8px 16px;font-size:13px;cursor:pointer;background:var(--paper);color:var(--ink-soft);
+    transition:background .12s ease, border-color .12s ease, color .12s ease;
+  }
+  .chip input{position:absolute;opacity:0;pointer-events:none;}
+  .chip:has(input:checked){
+    background:rgba(181,101,29,0.12);border-color:var(--copper);color:var(--copper-deep);font-weight:500;
+  }
+
+  .consent{
+    display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--ink-soft);
+    padding:16px 18px;border:1px solid var(--line);border-radius:6px;background:var(--paper-2);
+    margin:30px 0 24px;
+  }
+  .consent input{margin-top:3px;accent-color:var(--copper);flex:none;}
   .submit-btn{
-    font-size:14px;padding:14px 28px;border-radius:var(--radius);border:none;
-    background:var(--copper);color:#1C0D02;font-weight:500;cursor:pointer;
+    width:100%;font-size:14.5px;padding:15px 28px;border-radius:5px;border:none;
+    background:var(--copper);color:#1C0D02;font-weight:600;cursor:pointer;letter-spacing:0.01em;
   }
   .submit-btn:hover{background:var(--copper-light);}
   .submit-btn:disabled{opacity:0.5;cursor:default;}
-  .status-msg{margin-top:16px;font-size:13.5px;padding:12px 14px;border-radius:var(--radius);display:none;}
+  .status-msg{margin-top:14px;font-size:13px;padding:12px 14px;border-radius:5px;display:none;}
   .status-msg.ok{display:block;background:rgba(31,109,76,0.12);color:var(--circuit);}
   .status-msg.err{display:block;background:rgba(178,44,44,0.1);color:#B22C2C;}
 
-  .side-note{background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:24px;}
-  .side-note h3{font-size:14px;font-weight:600;margin:0 0 12px;}
-  .side-note ol{margin:0;padding-left:18px;font-size:13px;color:var(--ink-soft);}
-  .side-note li{margin-bottom:8px;}
-  .side-note .divider{border-top:1px solid var(--line);margin:18px 0;}
+  .side-note{
+    background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:28px;
+    position:sticky;top:88px;
+  }
+  .side-note h3{font-size:13.5px;font-weight:600;margin:0 0 16px;letter-spacing:0.01em;}
+  .mini-step{display:flex;gap:12px;margin-bottom:14px;}
+  .mini-step:last-child{margin-bottom:0;}
+  .mini-step .num{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--copper);flex:none;padding-top:1px;}
+  .mini-step p{margin:0;font-size:13px;color:var(--ink-soft);}
+  .side-note .divider{border-top:1px solid var(--line);margin:20px 0;}
   .side-note .contact{font-size:13px;color:var(--ink-soft);}
+  .side-note .contact .mono{display:block;margin-top:6px;color:var(--ink);}
 
   footer{background:var(--board);color:rgba(240,239,227,0.55);padding:40px 0 28px;font-size:12.5px;}
   footer a{color:rgba(240,239,227,0.7);}
@@ -118,49 +164,58 @@
 
 <main class="wrap">
   <div class="form-grid">
+    <div class="form-card">
     <form id="joinForm">
       <fieldset>
-        <legend class="mono">회원 유형</legend>
-        <div class="radio-row">
-          <label class="radio-opt"><input type="radio" name="member_type" value="개인회원" checked> 개인회원</label>
-          <label class="radio-opt"><input type="radio" name="member_type" value="기관회원"> 기관회원</label>
+        <legend>
+          <div class="step-legend"><span class="step-num">1</span><span class="step-title">회원 유형</span></div>
+        </legend>
+        <div class="segment">
+          <label><input type="radio" name="member_type" value="개인회원" checked>개인회원</label>
+          <label><input type="radio" name="member_type" value="기관회원">기관회원</label>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend class="mono">기본 정보</legend>
+        <legend>
+          <div class="step-legend"><span class="step-num">2</span><span class="step-title">기본 정보</span></div>
+        </legend>
         <div class="field">
-          <label for="name">이름 / 단체명</label>
+          <label for="name">이름 / 단체명<span class="req">*</span></label>
           <input type="text" id="name" name="name" required placeholder="홍길동 또는 (주)예시전자">
         </div>
         <div class="field">
-          <label for="org">소속<span class="hint">(선택)</span></label>
+          <label for="org">소속 <span style="font-weight:400;color:var(--ink-soft);">(선택)</span></label>
           <input type="text" id="org" name="organization" placeholder="회사, 연구소, 학교 등">
         </div>
         <div class="field">
-          <label for="email">이메일</label>
+          <label for="email">이메일<span class="req">*</span></label>
           <input type="email" id="email" name="email" required placeholder="name@example.com">
         </div>
         <div class="field">
-          <label for="phone">연락처<span class="hint">(선택)</span></label>
+          <label for="phone">연락처 <span style="font-weight:400;color:var(--ink-soft);">(선택)</span></label>
           <input type="tel" id="phone" name="phone" placeholder="010-0000-0000">
         </div>
       </fieldset>
 
       <fieldset>
-        <legend class="mono">관심 분야<span class="hint">(선택)</span></legend>
-        <div class="check-grid">
-          <label class="check-opt"><input type="checkbox" name="interest" value="PCB 설계"> PCB 설계</label>
-          <label class="check-opt"><input type="checkbox" name="interest" value="EDA"> EDA</label>
-          <label class="check-opt"><input type="checkbox" name="interest" value="AI"> AI</label>
-          <label class="check-opt"><input type="checkbox" name="interest" value="교육/인력양성"> 교육 · 인력양성</label>
-          <label class="check-opt"><input type="checkbox" name="interest" value="정책/표준"> 정책 · 표준</label>
-          <label class="check-opt"><input type="checkbox" name="interest" value="산학협력"> 산학협력</label>
+        <legend>
+          <div class="step-legend"><span class="step-num">3</span><span class="step-title">관심 분야<span class="hint">(선택, 복수 가능)</span></span></div>
+        </legend>
+        <div class="chip-grid">
+          <label class="chip"><input type="checkbox" name="interest" value="PCB 설계">PCB 설계</label>
+          <label class="chip"><input type="checkbox" name="interest" value="EDA">EDA</label>
+          <label class="chip"><input type="checkbox" name="interest" value="AI">AI</label>
+          <label class="chip"><input type="checkbox" name="interest" value="교육/인력양성">교육 · 인력양성</label>
+          <label class="chip"><input type="checkbox" name="interest" value="정책/표준">정책 · 표준</label>
+          <label class="chip"><input type="checkbox" name="interest" value="산학협력">산학협력</label>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend class="mono">가입 동기</legend>
+        <legend>
+          <div class="step-legend"><span class="step-num">4</span><span class="step-title">가입 동기<span class="hint">(선택)</span></span></div>
+        </legend>
         <div class="field">
           <textarea id="message" name="message" placeholder="협의회에 기대하는 점이나 참여하고 싶은 활동을 자유롭게 적어주세요."></textarea>
         </div>
@@ -174,18 +229,17 @@
       <button type="submit" class="submit-btn">신청서 제출</button>
       <div id="statusMsg" class="status-msg mono"></div>
     </form>
+    </div>
 
     <aside class="side-note">
       <h3>가입 절차</h3>
-      <ol>
-        <li>신청서 제출</li>
-        <li>운영위원회 검토 및 승인</li>
-        <li>승인 안내 이메일 발송 후 회원 활동 시작</li>
-      </ol>
+      <div class="mini-step"><span class="num">01</span><p>신청서 제출</p></div>
+      <div class="mini-step"><span class="num">02</span><p>운영위원회 검토 및 승인</p></div>
+      <div class="mini-step"><span class="num">03</span><p>승인 안내 이메일 발송 후 회원 활동 시작</p></div>
       <div class="divider"></div>
       <div class="contact">
-        문의사항은 아래로 연락 주세요.<br>
-        <span class="mono" style="color:var(--ink);">contact@aedna.example</span>
+        문의사항은 아래로 연락 주세요.
+        <span class="mono">contact@aedna.example</span>
       </div>
     </aside>
   </div>
