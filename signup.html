@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비밀번호 설정 — AEDNA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --board:#10241C; --paper:#F0EFE3; --paper-2:#E7E5D6; --ink:#14201B; --ink-soft:#4B564E;
+    --copper:#B5651D; --copper-light:#E3A467; --circuit:#1F6D4C; --line:rgba(20,32,27,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);min-height:100vh;
+    font-family:"Pretendard Variable","Pretendard",-apple-system,"Malgun Gothic",sans-serif;
+    line-height:1.6;display:flex;align-items:center;justify-content:center;padding:24px;}
+  a{color:inherit;}
+  .card{width:100%;max-width:400px;background:var(--paper);border:1px solid var(--line);
+    border-radius:10px;padding:40px 36px;}
+  .brand{display:flex;align-items:center;gap:8px;text-decoration:none;margin-bottom:28px;}
+  .brand-mark{width:22px;height:22px;flex:none;}
+  .brand-text{font-size:14px;font-weight:600;}
+  h1{font-size:20px;font-weight:600;margin:0 0 8px;}
+  .desc{font-size:13.5px;color:var(--ink-soft);margin:0 0 28px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;color:var(--ink-soft);font-weight:500;margin-bottom:7px;}
+  input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:5px;
+    background:var(--paper);color:var(--ink);font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:var(--copper);box-shadow:0 0 0 3px rgba(181,101,29,0.14);}
+  input:disabled{background:var(--paper-2);color:var(--ink-soft);}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:6px;}
+  .submit-btn{width:100%;font-size:14.5px;padding:14px;border-radius:5px;border:none;
+    background:var(--copper);color:#1C0D02;font-weight:600;cursor:pointer;margin-top:8px;}
+  .submit-btn:hover{background:var(--copper-light);}
+  .submit-btn:disabled{opacity:0.5;cursor:default;}
+  .status-msg{margin-top:16px;font-size:13px;padding:12px 14px;border-radius:5px;display:none;}
+  .status-msg.ok{display:block;background:rgba(31,109,76,0.12);color:var(--circuit);}
+  .status-msg.err{display:block;background:rgba(178,44,44,0.1);color:#B22C2C;}
+  .foot-link{margin-top:22px;font-size:13px;color:var(--ink-soft);text-align:center;}
+  .foot-link a{color:var(--copper);text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <a class="brand" href="index.html">
+    <svg class="brand-mark" viewBox="0 0 26 26" fill="none">
+      <rect x="6" y="6" width="14" height="14" rx="1" stroke="var(--copper)" stroke-width="1.6"/>
+      <path d="M6 10H2M6 16H2M20 10H24M20 16H24M10 6V2M16 6V2M10 20V24M16 20V24" stroke="var(--ink)" stroke-width="1.4"/>
+    </svg>
+    <span class="brand-text">AEDNA</span>
+  </a>
+
+  <h1>비밀번호 설정</h1>
+  <p class="desc">가입이 승인되었습니다. 로그인에 사용할 비밀번호를 설정해 주세요.</p>
+
+  <form id="signupForm">
+    <div class="field">
+      <label for="email">이메일</label>
+      <input type="email" id="email" disabled>
+    </div>
+    <div class="field">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" required minlength="6" placeholder="6자 이상 입력">
+    </div>
+    <div class="field">
+      <label for="confirm">비밀번호 확인</label>
+      <input type="password" id="confirm" required minlength="6" placeholder="비밀번호를 한번 더 입력">
+      <div class="hint" id="matchHint"></div>
+    </div>
+    <button type="submit" class="submit-btn" id="submitBtn">계정 만들기</button>
+    <div id="statusMsg" class="status-msg"></div>
+  </form>
+
+  <div class="foot-link">이미 계정이 있으신가요? <a href="login.html">로그인</a></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCREJ9SpCMgMQLndCKFetdBJmXelqF6YRA",
+    authDomain: "aedna-a3146.firebaseapp.com",
+    projectId: "aedna-a3146",
+    storageBucket: "aedna-a3146.firebasestorage.app",
+    messagingSenderId: "675277322776",
+    appId: "1:675277322776:web:862cb60ccd4b0d649d216d"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const params = new URLSearchParams(location.search);
+  const emailFromLink = params.get('email') || '';
+  document.getElementById('email').value = emailFromLink;
+
+  const form = document.getElementById('signupForm');
+  const statusMsg = document.getElementById('statusMsg');
+  const submitBtn = document.getElementById('submitBtn');
+  const passwordInput = document.getElementById('password');
+  const confirmInput = document.getElementById('confirm');
+  const matchHint = document.getElementById('matchHint');
+
+  function checkMatch(){
+    if (confirmInput.value && passwordInput.value !== confirmInput.value) {
+      matchHint.textContent = '비밀번호가 일치하지 않습니다.';
+      matchHint.style.color = '#B22C2C';
+    } else {
+      matchHint.textContent = '';
+    }
+  }
+  passwordInput.addEventListener('input', checkMatch);
+  confirmInput.addEventListener('input', checkMatch);
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = passwordInput.value;
+    const confirm = confirmInput.value;
+
+    statusMsg.className = 'status-msg';
+    statusMsg.textContent = '';
+
+    if (!email) {
+      statusMsg.classList.add('err');
+      statusMsg.textContent = '이메일 정보가 없습니다. 승인 메일의 링크로 다시 접속해 주세요.';
+      return;
+    }
+    if (password !== confirm) {
+      statusMsg.classList.add('err');
+      statusMsg.textContent = '비밀번호가 일치하지 않습니다.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '처리 중...';
+
+    try {
+      const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      await cred.user.sendEmailVerification();
+      statusMsg.classList.add('ok');
+      statusMsg.textContent = '계정이 만들어졌습니다. 이메일로 발송된 인증 링크를 클릭한 뒤 로그인해 주세요.';
+      form.reset();
+      document.getElementById('email').value = email;
+    } catch (err) {
+      statusMsg.classList.add('err');
+      if (err.code === 'auth/email-already-in-use') {
+        statusMsg.innerHTML = '이미 계정이 있습니다. <a href="login.html?email=' + encodeURIComponent(email) + '" style="color:var(--copper);text-decoration:underline;">로그인 페이지로 이동</a>';
+      } else if (err.code === 'auth/weak-password') {
+        statusMsg.textContent = '비밀번호는 6자 이상이어야 합니다.';
+      } else {
+        statusMsg.textContent = '계정을 만들지 못했습니다: ' + err.message;
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '계정 만들기';
+    }
+  });
+</script>
+
+</body>
+</html>

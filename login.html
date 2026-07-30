@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 — AEDNA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<style>
+  :root{
+    --board:#10241C; --paper:#F0EFE3; --paper-2:#E7E5D6; --ink:#14201B; --ink-soft:#4B564E;
+    --copper:#B5651D; --copper-light:#E3A467; --circuit:#1F6D4C; --line:rgba(20,32,27,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);min-height:100vh;
+    font-family:"Pretendard Variable","Pretendard",-apple-system,"Malgun Gothic",sans-serif;
+    line-height:1.6;display:flex;align-items:center;justify-content:center;padding:24px;}
+  a{color:inherit;}
+  .card{width:100%;max-width:400px;background:var(--paper);border:1px solid var(--line);
+    border-radius:10px;padding:40px 36px;}
+  .brand{display:flex;align-items:center;gap:8px;text-decoration:none;margin-bottom:28px;}
+  .brand-mark{width:22px;height:22px;flex:none;}
+  .brand-text{font-size:14px;font-weight:600;}
+  h1{font-size:20px;font-weight:600;margin:0 0 8px;}
+  .desc{font-size:13.5px;color:var(--ink-soft);margin:0 0 28px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;color:var(--ink-soft);font-weight:500;margin-bottom:7px;}
+  input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:5px;
+    background:var(--paper);color:var(--ink);font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:var(--copper);box-shadow:0 0 0 3px rgba(181,101,29,0.14);}
+  .submit-btn{width:100%;font-size:14.5px;padding:14px;border-radius:5px;border:none;
+    background:var(--copper);color:#1C0D02;font-weight:600;cursor:pointer;margin-top:8px;}
+  .submit-btn:hover{background:var(--copper-light);}
+  .submit-btn:disabled{opacity:0.5;cursor:default;}
+  .status-msg{margin-top:16px;font-size:13px;padding:12px 14px;border-radius:5px;display:none;}
+  .status-msg.ok{display:block;background:rgba(31,109,76,0.12);color:var(--circuit);}
+  .status-msg.err{display:block;background:rgba(178,44,44,0.1);color:#B22C2C;}
+  .status-msg .resend{display:inline-block;margin-top:8px;font-size:12.5px;text-decoration:underline;cursor:pointer;color:inherit;}
+  .foot-link{margin-top:22px;font-size:13px;color:var(--ink-soft);text-align:center;}
+  .foot-link a{color:var(--copper);text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <a class="brand" href="index.html">
+    <svg class="brand-mark" viewBox="0 0 26 26" fill="none">
+      <rect x="6" y="6" width="14" height="14" rx="1" stroke="var(--copper)" stroke-width="1.6"/>
+      <path d="M6 10H2M6 16H2M20 10H24M20 16H24M10 6V2M16 6V2M10 20V24M16 20V24" stroke="var(--ink)" stroke-width="1.4"/>
+    </svg>
+    <span class="brand-text">AEDNA</span>
+  </a>
+
+  <h1>회원 로그인</h1>
+  <p class="desc">가입 승인 후 설정하신 이메일과 비밀번호로 로그인하세요.</p>
+
+  <form id="loginForm">
+    <div class="field">
+      <label for="email">이메일</label>
+      <input type="email" id="email" required placeholder="name@example.com">
+    </div>
+    <div class="field">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" required placeholder="비밀번호 입력">
+    </div>
+    <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
+    <div id="statusMsg" class="status-msg"></div>
+  </form>
+
+  <div class="foot-link">아직 계정이 없으신가요? <a href="join.html">가입 신청하기</a></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCREJ9SpCMgMQLndCKFetdBJmXelqF6YRA",
+    authDomain: "aedna-a3146.firebaseapp.com",
+    projectId: "aedna-a3146",
+    storageBucket: "aedna-a3146.firebasestorage.app",
+    messagingSenderId: "675277322776",
+    appId: "1:675277322776:web:862cb60ccd4b0d649d216d"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const params = new URLSearchParams(location.search);
+  const emailFromLink = params.get('email');
+  if (emailFromLink) document.getElementById('email').value = emailFromLink;
+
+  const form = document.getElementById('loginForm');
+  const statusMsg = document.getElementById('statusMsg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    statusMsg.className = 'status-msg';
+    statusMsg.innerHTML = '';
+    submitBtn.disabled = true;
+    submitBtn.textContent = '확인 중...';
+
+    try {
+      const cred = await firebase.auth().signInWithEmailAndPassword(email, password);
+      if (!cred.user.emailVerified) {
+        statusMsg.classList.add('err');
+        statusMsg.innerHTML = '이메일 인증이 아직 완료되지 않았습니다. 받은 편지함을 확인해 주세요.' +
+          '<br><span class="resend" id="resendBtn">인증 메일 다시 보내기</span>';
+        document.getElementById('resendBtn').addEventListener('click', async function(){
+          await cred.user.sendEmailVerification();
+          this.textContent = '다시 보냈습니다';
+        });
+        await firebase.auth().signOut();
+        return;
+      }
+      statusMsg.classList.add('ok');
+      statusMsg.textContent = '로그인되었습니다. 이동 중...';
+      location.href = 'members.html';
+    } catch (err) {
+      statusMsg.classList.add('err');
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        statusMsg.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
+      } else {
+        statusMsg.textContent = '로그인에 실패했습니다: ' + err.message;
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '로그인';
+    }
+  });
+</script>
+
+</body>
+</html>
