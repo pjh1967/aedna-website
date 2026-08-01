@@ -12,8 +12,7 @@
   :root{
     --board:#10241C; --board-2:#173327; --paper:#F0EFE3; --paper-2:#E7E5D6;
     --ink:#14201B; --ink-soft:#4B564E; --copper:#B5651D; --copper-deep:#7E4514;
-    --copper-light:#E3A467; --circuit:#1F6D4C; --line:rgba(20,32,27,0.14); --radius:2px;
-  }
+    --copper-light:#E3A467; --circuit:#1F6D4C; --line:rgba(20,32,27,0.14); --radius:2px; --fs-scale:1;}
   *{box-sizing:border-box;}
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:"Pretendard Variable","Pretendard",-apple-system,"Malgun Gothic",sans-serif;
@@ -26,24 +25,24 @@
   .nav{max-width:1120px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
   .brand-mark{width:26px;height:26px;flex:none;}
-  .brand-text{font-size:15px;font-weight:600;letter-spacing:0.04em;}
-  .brand-sub{display:block;font-size:10px;color:var(--ink-soft);letter-spacing:0.06em;font-weight:400;}
+  .brand-text{font-size:calc(15px * var(--fs-scale));font-weight:600;letter-spacing:0.04em;}
+  .brand-sub{display:block;font-size:calc(10px * var(--fs-scale));color:var(--ink-soft);letter-spacing:0.06em;font-weight:400;}
   .navlinks{display:flex;gap:2px;list-style:none;margin:0;padding:0;}
-  .navlinks a{display:block;padding:8px 14px;font-size:13px;text-decoration:none;color:var(--ink-soft);border-radius:var(--radius);}
+  .navlinks a{display:block;padding:8px 14px;font-size:calc(13px * var(--fs-scale));text-decoration:none;color:var(--ink-soft);border-radius:var(--radius);}
   .navlinks a:hover{color:var(--ink);background:var(--paper-2);}
   .navlinks a.active{color:var(--ink);font-weight:500;}
-  .navcta{font-size:12.5px;padding:9px 16px;border:1px solid var(--ink);border-radius:var(--radius);
+  .navcta{font-size:calc(12.5px * var(--fs-scale));padding:9px 16px;border:1px solid var(--ink);border-radius:var(--radius);
     text-decoration:none;color:var(--ink);white-space:nowrap;}
   .navcta:hover{background:var(--ink);color:var(--paper);}
   @media(max-width:860px){.navlinks{display:none;}}
 
   .page-banner{background:var(--board);color:var(--paper);padding:64px 0 56px;}
   .page-banner .inner{max-width:880px;margin:0 auto;padding:0 32px;}
-  .ref{display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--copper-light);
+  .ref{display:inline-flex;align-items:center;gap:8px;font-size:calc(11px * var(--fs-scale));color:var(--copper-light);
     letter-spacing:0.1em;margin-bottom:14px;}
   .ref .via{width:7px;height:7px;border-radius:50%;background:var(--copper);flex:none;}
   .page-banner h1{font-size:clamp(26px,4vw,38px);font-weight:600;margin:0 0 12px;letter-spacing:-0.01em;}
-  .page-banner p{font-size:15px;color:rgba(240,239,227,0.68);margin:0;max-width:520px;}
+  .page-banner p{font-size:calc(15px * var(--fs-scale));color:rgba(240,239,227,0.68);margin:0;max-width:520px;}
 
   main{padding:56px 0 96px;}
   .notice-list{border-top:1px solid var(--line);}
@@ -53,19 +52,20 @@
     display:grid;grid-template-columns:90px 1fr 20px;gap:16px;align-items:center;
   }
   details.notice summary::-webkit-details-marker{display:none;}
-  .notice-date{font-size:12px;color:var(--copper-deep);}
-  .notice-title{font-size:15px;font-weight:500;}
-  .notice-caret{font-size:13px;color:var(--ink-soft);transition:transform 0.15s ease;}
+  .notice-date{font-size:calc(12px * var(--fs-scale));color:var(--copper-deep);}
+  .notice-title{font-size:calc(15px * var(--fs-scale));font-weight:500;}
+  .notice-caret{font-size:calc(13px * var(--fs-scale));color:var(--ink-soft);transition:transform 0.15s ease;}
   details[open] .notice-caret{transform:rotate(45deg);}
-  .notice-body{padding:0 4px 26px 106px;font-size:14px;color:var(--ink-soft);max-width:640px;}
+  .notice-body{padding:0 4px 26px 106px;font-size:calc(14px * var(--fs-scale));color:var(--ink-soft);max-width:640px;}
   @media(max-width:600px){
     details.notice summary{grid-template-columns:70px 1fr 16px;}
     .notice-body{padding-left:86px;}
   }
 
-  footer{background:var(--board);color:rgba(240,239,227,0.55);padding:40px 0 28px;font-size:12.5px;}
+  footer{background:var(--board);color:rgba(240,239,227,0.55);padding:40px 0 28px;font-size:calc(12.5px * var(--fs-scale));}
   footer a{color:rgba(240,239,227,0.7);}
   .foot-wrap{max-width:1120px;margin:0 auto;padding:0 32px;}
+  @media(min-width:861px){:root{--fs-scale:1.12;}}
 </style>
 </head>
 <body>
