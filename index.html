@@ -62,9 +62,18 @@
     text-decoration:none;color:var(--ink);white-space:nowrap;
   }
   .navcta:hover{background:var(--ink);color:var(--paper);}
-  .navtoggle{display:none;}
+  .navtoggle{display:none;background:none;border:none;cursor:pointer;padding:6px;margin-right:4px;color:var(--ink);}
+  .navtoggle svg{display:block;}
   @media(max-width:860px){
-    .navlinks{display:none;}
+    .navlinks{
+      display:none;position:absolute;top:100%;left:0;right:0;
+      flex-direction:column;gap:0;background:var(--paper);
+      border-bottom:1px solid var(--line);padding:6px 32px 14px;
+      box-shadow:0 12px 20px rgba(20,32,27,0.1);
+    }
+    .navlinks.open{display:flex;}
+    .navlinks a{padding:13px 4px;font-size:14px;}
+    .navtoggle{display:inline-flex;align-items:center;justify-content:center;}
   }
 
   /* ===== hero ===== */
@@ -216,19 +225,39 @@
         <span class="brand-sub mono">AI ELECTRONIC DESIGN AUTOMATION NETWORK</span>
       </span>
     </a>
-    <ul class="navlinks">
+    <ul class="navlinks" id="navlinks">
       <li><a href="#purpose">목적</a></li>
       <li><a href="#activities">활동</a></li>
       <li><a href="#members">회원</a></li>
       <li><a href="#governance">운영체계</a></li>
       <li><a href="notice.html">공지사항</a></li>
     </ul>
+    <button type="button" class="navtoggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="navlinks">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
     <a href="login.html" aria-label="로그인" title="로그인" style="display:inline-flex;align-items:center;color:var(--ink-soft);text-decoration:none;margin-right:6px;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
     </a>
     <a class="navcta" href="join.html">가입 신청</a>
   </div>
 </header>
+<script>
+(function(){
+  var btn = document.getElementById('navToggle');
+  var links = document.getElementById('navlinks');
+  if(!btn || !links) return;
+  btn.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  links.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      links.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
+</script>
 
 <section class="hero" id="top">
   <svg class="hero-board" viewBox="0 0 1120 520" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
