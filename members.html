@@ -28,8 +28,13 @@
   .hidden{display:none !important;}
   h1{font-size:calc(24px * var(--fs-scale));font-weight:600;margin:0 0 8px;}
   .welcome{font-size:calc(14px * var(--fs-scale));color:var(--ink-soft);margin:0 0 32px;}
-  .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:28px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:28px;margin-bottom:16px;}
   .card p{font-size:calc(14px * var(--fs-scale));color:var(--ink-soft);margin:0;}
+  .danger-card{border-color:rgba(178,44,44,0.25);}
+  .withdraw-btn{margin-top:14px;font-size:calc(12.5px * var(--fs-scale));padding:9px 18px;border:1px solid #B22C2C;
+    border-radius:5px;background:none;color:#B22C2C;cursor:pointer;}
+  .withdraw-btn:hover{background:#B22C2C;color:#fff;}
+  .withdraw-btn:disabled{opacity:0.5;cursor:default;}
   @media(min-width:861px){:root{--fs-scale:1.12;}}
 </style>
 </head>
@@ -58,6 +63,12 @@
     <div class="card">
       <p>이 페이지는 로그인한 회원에게만 표시됩니다. 앞으로 이 자리에 자료실, 행사 안내, 회원 명부 같은 콘텐츠를 채워나갈 예정입니다.</p>
     </div>
+
+    <div class="card danger-card">
+      <p style="color:var(--ink);font-weight:600;margin-bottom:4px;">회원 탈퇴</p>
+      <p>탈퇴하시면 계정 및 회원 권한이 즉시 삭제되며 되돌릴 수 없습니다.</p>
+      <button class="withdraw-btn" id="withdrawBtn">회원 탈퇴하기</button>
+    </div>
   </main>
 </div>
 
@@ -81,22 +92,71 @@
     const gate = document.getElementById('gate');
     const app = document.getElementById('app');
     if (user && user.emailVerified) {
+      let role = 'guest', status = '';
+      try {
+        const res = await fetch(SHEET_ENDPOINT + '?action=role&email=' + encodeURIComponent(user.email));
+        const data = await res.json();
+        role = (data.role || '').toLowerCase();
+        status = data.status || '';
+      } catch (err) {
+        // 역할 조회 실패 시 일반 회원으로 취급
+      }
+
+      if (status === '탈퇴') {
+        alert('관리자에 의해 탈퇴 처리된 계정입니다. 문의사항은 운영진에게 연락해 주세요.');
+        await firebase.auth().signOut();
+        location.href = 'login.html';
+        return;
+      }
+
       gate.classList.add('hidden');
       app.classList.remove('hidden');
       document.getElementById('welcomeMsg').textContent = user.email + ' 님, 환영합니다.';
 
-      try {
-        const res = await fetch(SHEET_ENDPOINT + '?action=role&email=' + encodeURIComponent(user.email));
-        const data = await res.json();
-        const role = (data.role || '').toLowerCase();
-        if (role === 'admin' || role === 'super admin') {
-          document.getElementById('adminLink').style.display = 'inline-flex';
-        }
-      } catch (err) {
-        // 역할 조회 실패 시 관리자 메뉴는 노출하지 않음 (일반 회원 화면 유지)
+      if (role === 'admin' || role === 'super admin') {
+        document.getElementById('adminLink').style.display = 'inline-flex';
       }
     } else {
       location.href = 'login.html';
+    }
+  });
+
+  document.getElementById('withdrawBtn').addEventListener('click', async function(){
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+    if (!confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = '처리 중...';
+
+    try {
+      const r = await fetch(SHEET_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ action: 'withdraw', requesterEmail: user.email })
+      });
+      const d = await r.json();
+      if (!d.ok) {
+        alert(d.error || '탈퇴 처리 중 오류가 발생했습니다.');
+        btn.disabled = false;
+        btn.textContent = '회원 탈퇴하기';
+        return;
+      }
+
+      try {
+        await user.delete();
+      } catch (authErr) {
+        // 재로그인이 필요한 경우 등: 시트 상태는 이미 탈퇴로 반영되었으므로 로그아웃만 진행
+      }
+
+      alert('탈퇴가 완료되었습니다. 그동안 이용해 주셔서 감사합니다.');
+      await firebase.auth().signOut().catch(function(){});
+      location.href = 'index.html';
+    } catch (err) {
+      alert('네트워크 오류로 탈퇴 처리에 실패했습니다.');
+      btn.disabled = false;
+      btn.textContent = '회원 탈퇴하기';
     }
   });
 

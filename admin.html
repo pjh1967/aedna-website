@@ -56,6 +56,9 @@
     background:none;color:var(--copper);cursor:pointer;font-weight:600;}
   .apply-btn:hover{background:var(--copper);color:#1C0D02;}
   .apply-btn:disabled{opacity:0.4;cursor:default;}
+  .apply-btn.danger-btn{border-color:#B22C2C;color:#B22C2C;}
+  .apply-btn.danger-btn:hover{background:#B22C2C;color:#fff;}
+  .status-pill.탈퇴{background:rgba(75,86,78,0.18);color:var(--ink-soft);text-decoration:line-through;}
 
   .empty{text-align:center;padding:48px;color:var(--ink-soft);font-size:13.5px;}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);
@@ -105,6 +108,7 @@
             <th>역할</th>
             <th>상태 처리</th>
             <th id="roleColHeader" style="display:none;">권한 부여</th>
+            <th>회원 관리</th>
           </tr>
         </thead>
         <tbody id="memberRows">
@@ -192,6 +196,11 @@
             '<select class="roleSelect">' + roleOptions(m.role) + '</select>' +
             '<button class="apply-btn roleApply">적용</button>' +
           '</div>' +
+        '</td>' +
+        '<td>' +
+          (String(m.role || '').toLowerCase() === 'super admin'
+            ? '<span style="color:var(--ink-soft);font-size:11.5px;">보호된 계정</span>'
+            : '<button class="apply-btn danger-btn forceWithdrawBtn">강제 탈퇴</button>') +
         '</td>';
 
       tr.querySelector('.statusApply').addEventListener('click', async function(){
@@ -235,6 +244,30 @@
             });
             const d = await r.json();
             if (d.ok) { showToast(m.name + ' 님 역할이 "' + newRole + '"(으)로 변경되었습니다.'); loadMembers(); }
+            else { showToast(d.error || '처리 실패', true); }
+          } catch (err) { showToast('네트워크 오류', true); }
+          finally { btn.disabled = false; }
+        });
+      }
+
+      const forceWithdrawBtn = tr.querySelector('.forceWithdrawBtn');
+      if (forceWithdrawBtn) {
+        forceWithdrawBtn.addEventListener('click', async function(){
+          if (!confirm(m.name + ' 님을 강제 탈퇴시키겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+          const btn = this;
+          btn.disabled = true;
+          try {
+            const r = await fetch(SHEET_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({
+                action: 'forceWithdraw',
+                requesterEmail: currentUserEmail,
+                targetEmail: m.email
+              })
+            });
+            const d = await r.json();
+            if (d.ok) { showToast(m.name + ' 님이 강제 탈퇴 처리되었습니다.'); loadMembers(); }
             else { showToast(d.error || '처리 실패', true); }
           } catch (err) { showToast('네트워크 오류', true); }
           finally { btn.disabled = false; }
