@@ -51,6 +51,20 @@
     .mobile-drawer a{
       padding:13px 4px;font-size:14px;color:var(--ink-soft);text-decoration:none;
     }
+    .drawer-actions{
+      display:flex;flex-direction:column;gap:8px;margin-bottom:16px;
+      padding-bottom:16px;border-bottom:1px solid var(--line);
+    }
+    .drawer-actions a{
+      display:flex;align-items:center;justify-content:center;gap:6px;
+      padding:11px 8px;border-radius:var(--radius);font-size:13.5px;font-weight:600;
+    }
+    .drawer-actions .drawer-signup{background:var(--copper);color:#1C0D02;}
+    .drawer-actions .drawer-signup:hover{background:var(--copper-light);}
+    .drawer-actions .drawer-login{
+      border:1px solid var(--ink);color:var(--ink);font-weight:500;
+    }
+    .drawer-actions .drawer-login svg{flex:none;}
     .nav-overlay{
       display:block;position:fixed;inset:0;background:rgba(16,36,28,0.4);
       z-index:55;opacity:0;pointer-events:none;transition:opacity 0.25s ease;
@@ -168,7 +182,7 @@
       <span class="brand-sub mono">AI ELECTRONIC DESIGN AUTOMATION NETWORK</span></span>
     </a>
     <ul class="navlinks">
-      <li><a href="index.html#purpose">목적</a></li>
+      <li><a href="index.html#purpose">협의회 목적</a></li>
       <li><a href="index.html#activities">활동</a></li>
       <li><a href="index.html#members">회원</a></li>
       <li><a href="notice.html">공지사항</a></li>
@@ -184,7 +198,14 @@
 </header>
 <div class="nav-overlay" id="navOverlay"></div>
 <nav class="mobile-drawer" id="mobileDrawer" aria-label="모바일 메뉴">
-  <a href="index.html#purpose">목적</a>
+  <div class="drawer-actions">
+    <a class="drawer-signup" href="join.html">가입 신청</a>
+    <a class="drawer-login" href="login.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+      로그인
+    </a>
+  </div>
+  <a href="index.html#purpose">협의회 목적</a>
   <a href="index.html#activities">활동</a>
   <a href="index.html#members">회원</a>
   <a href="notice.html">공지사항</a>
