@@ -46,7 +46,10 @@
       </svg>
       <span class="brand-text">AEDNA</span>
     </a>
-    <button class="logout-btn" id="logoutBtn">로그아웃</button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="admin.html" id="adminLink" class="logout-btn" style="display:none;text-decoration:none;">관리자 페이지</a>
+      <button class="logout-btn" id="logoutBtn">로그아웃</button>
+    </div>
   </header>
 
   <main>
@@ -71,13 +74,27 @@
   };
   firebase.initializeApp(firebaseConfig);
 
-  firebase.auth().onAuthStateChanged(function(user){
+  // join.html과 동일한 Apps Script 배포 URL
+  const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyFFdEtgq0GwY-bhhHL4JRALM4Hd5WFIVFD6jCHzA6G07BRa5Xtnf23Z9vOepLRyQlO1w/exec';
+
+  firebase.auth().onAuthStateChanged(async function(user){
     const gate = document.getElementById('gate');
     const app = document.getElementById('app');
     if (user && user.emailVerified) {
       gate.classList.add('hidden');
       app.classList.remove('hidden');
       document.getElementById('welcomeMsg').textContent = user.email + ' 님, 환영합니다.';
+
+      try {
+        const res = await fetch(SHEET_ENDPOINT + '?action=role&email=' + encodeURIComponent(user.email));
+        const data = await res.json();
+        const role = (data.role || '').toLowerCase();
+        if (role === 'admin' || role === 'super admin') {
+          document.getElementById('adminLink').style.display = 'inline-flex';
+        }
+      } catch (err) {
+        // 역할 조회 실패 시 관리자 메뉴는 노출하지 않음 (일반 회원 화면 유지)
+      }
     } else {
       location.href = 'login.html';
     }
