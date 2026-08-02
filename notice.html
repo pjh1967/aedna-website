@@ -34,7 +34,7 @@
   .navcta{font-size:calc(12.5px * var(--fs-scale));padding:9px 16px;border:1px solid var(--ink);border-radius:var(--radius);
     text-decoration:none;color:var(--ink);white-space:nowrap;}
   .navcta:hover{background:var(--ink);color:var(--paper);}
-  .navtoggle{display:none;background:none;border:none;cursor:pointer;padding:6px;margin-right:4px;color:var(--ink);}
+  .navtoggle{display:none;background:none;border:none;cursor:pointer;padding:6px;margin-left:8px;color:var(--ink);}
   .navtoggle svg{display:block;}
   .nav-overlay{display:none;}
   .mobile-drawer{display:none;}
@@ -43,10 +43,10 @@
     .navtoggle{display:inline-flex;align-items:center;justify-content:center;}
     .mobile-drawer{
       display:flex;flex-direction:column;gap:0;
-      position:fixed;top:0;left:0;bottom:0;width:76%;max-width:300px;
+      position:fixed;top:0;right:0;bottom:0;width:76%;max-width:300px;
       background:var(--paper);padding:84px 28px 24px;
-      box-shadow:2px 0 24px rgba(20,32,27,0.18);
-      transform:translateX(-100%);transition:transform 0.25s ease;z-index:60;
+      box-shadow:-2px 0 24px rgba(20,32,27,0.18);
+      transform:translateX(100%);transition:transform 0.25s ease;z-index:60;
     }
     .mobile-drawer.open{transform:translateX(0);}
     .mobile-drawer a{
@@ -109,13 +109,13 @@
       <li><a href="index.html#members">회원</a></li>
       <li><a href="notice.html" class="active">공지사항</a></li>
     </ul>
-    <button type="button" class="navtoggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileDrawer">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-    </button>
     <a href="login.html" aria-label="로그인" title="로그인" style="display:inline-flex;align-items:center;color:var(--ink-soft);text-decoration:none;margin-right:6px;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
     </a>
     <a class="navcta" href="join.html">가입 신청</a>
+    <button type="button" class="navtoggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileDrawer">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
   </div>
 </header>
 <div class="nav-overlay" id="navOverlay"></div>
