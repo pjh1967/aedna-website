@@ -114,6 +114,9 @@
     <div class="field">
       <label for="password">비밀번호</label>
       <input type="password" id="password" required placeholder="비밀번호 입력">
+      <div style="text-align:right;margin-top:6px;">
+        <a href="#" id="forgotPwLink" style="font-size:12.5px;color:var(--ink-soft);text-decoration:underline;">비밀번호를 잊으셨나요?</a>
+      </div>
     </div>
     <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
     <div id="statusMsg" class="status-msg"></div>
@@ -180,6 +183,28 @@
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = '로그인';
+    }
+  });
+
+  document.getElementById('forgotPwLink').addEventListener('click', async function(e){
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    if (!email) {
+      statusMsg.className = 'status-msg err';
+      statusMsg.textContent = '비밀번호를 재설정할 이메일을 먼저 입력해 주세요.';
+      return;
+    }
+    try {
+      await firebase.auth().sendPasswordResetEmail(email);
+      statusMsg.className = 'status-msg ok';
+      statusMsg.textContent = email + '(으)로 비밀번호 재설정 메일을 보냈습니다. 받은 편지함을 확인해 주세요.';
+    } catch (err) {
+      statusMsg.className = 'status-msg err';
+      if (err.code === 'auth/user-not-found') {
+        statusMsg.textContent = '해당 이메일로 가입된 계정을 찾을 수 없습니다.';
+      } else {
+        statusMsg.textContent = '재설정 메일 발송에 실패했습니다: ' + err.message;
+      }
     }
   });
 </script>
